@@ -1,0 +1,80 @@
+;;; REPEAT
+;;;   Parameters:
+;;;     atm - the constant that we want repeated
+;;;     N   - the number of times we want the constant repeated
+;;;   Purpose:
+;;;     Constructs a new list with atm repeated N times
+(defun repeat(atm N)
+      (cond ( (NULL atm) NIL )
+            ( (EQL N 0) NIL )
+            ( T (CONS atm (repeat atm (1- N))) ) ) ) 
+
+;;; DUPLICATE
+;;;   Parameters:
+;;;     lis - a list to duplicate
+;;;   Purpose:
+;;;     Duplicates each atom at the top level of a list.
+;;;     If no list exists at the top-level, it isn't duplicated.
+(defun duplicate(lis)
+      (cond (  (NULL lis) NIL )
+            (( ATOM (CAR lis) ) 
+             (APPEND (REPEAT (CAR lis ) 2) (DUPLICATE (CDR lis)) ) )
+            (T (CONS (CAR lis) (DUPLICATE (CDR lis) ) ) ) ) )
+             
+;;; DUPLICATEN
+;;;   Parameters:
+;;;     lis - a list to duplicate
+;;;     N   - how many times we want the list duplicated
+;;;   Purpose:
+;;;     Duplicates each atom at the top level N times.
+;;;     If no list exists at the top level, it isn't duplicated.
+;;;     However, it is included in result.
+(defun duplicateN(lis N) 
+      (cond ( (NULL lis) NIL )
+            ( (EQL N 0) NIL)  
+            ( (ATOM (CAR lis) ) (APPEND (REPEAT (CAR lis) N) (duplicateN (CDR lis) N)))
+            (T (CONS (CAR lis) (duplicateN(CDR lis) N) ) ) ) )
+
+;;; DUPLICATEDEEP
+;;;   Parameters:
+;;;     lis - a list to duplicate
+;;;   Purpose:
+;;;     Duplicates each atom at any level.
+;;;     If there is a list any any level, each atom in that list is duplicated.
+(defun duplicateDeep(lis)
+      (cond ( (NULL lis) NIL )
+            ( (ATOM (CAR lis) )
+              (APPEND (REPEAT (CAR lis) 2) (DUPLICATEDEEP (CDR lis)) ))
+            (T (CONS (DUPLICATEDEEP(CAR lis)) (DUPLICATEDEEP(CDR lis))  ) ) ) )
+
+;;; READLIST
+;;;   Parameters:
+;;;     lis - a list that we can loop through and print
+;;;   Purpose:
+;;;     Print each item of the list that is at the top level
+(defun readList(lis)
+   (cond ( (NULL lis) NIL)
+          ( T (PRINC (CAR lis)) (PRINC " ") (readList (CDR lis)))))
+
+;;; PRINTWOP
+;;;   Parameters:
+;;;     lis - a list to be printed
+;;;   Purpose:
+;;;     Prints a list without surrounding parentheses.
+;;;      One element of a list per line
+(defun printWOP(lis)
+    (terpri)
+    (cond ( ( ATOM lis) (PRINC lis) )
+          ( T (readList lis) )) 
+          (terpri)
+          T )
+
+;;; EVALEACH
+;;;   Parameters:
+;;;     lis - a list of values that need to be evaluated
+;;;   Purposes:
+;;;     Evaluates each item in the list
+(defun evalEach(lis)
+    (cond ( (NULL lis) NIL )
+          ( (NULL (CDR lis)) (eval(CAR lis)))
+          ( T (eval (CAR lis)) (evalEach (CDR lis)))))
