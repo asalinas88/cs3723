@@ -1,0 +1,1261 @@
+Metadata
+Node Type  Beg Attr Sub Total Sz
+Customer      0           48
+		Attribute Name Type Offset Size
+		customerId       S       0    8
+		name             S       8   16
+		pFirstItem       P      24    8
+		pNextCust        P      32    8
+		balance          D      40    8
+LineItem      5           32
+		Attribute Name Type Offset Size
+		productId        S       0   10
+		iQtyReq          I      12    4
+		dCost            D      16    8
+		pNextItem        P      24    8
+>>> ALLOC C111 Customer 111,Sal A Mander,NULL,NULL,100.00
+>>> PRTNODE C111
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d070        53      0    0176D075
+			Attr Name      Type Value     
+			customerId       S  111
+			name             S  Sal A Mander
+			pFirstItem       P  00000000
+			pNextCust        P  00000000
+			balance          D  100.000000
+>>> ALLOC C222 Customer 222,Barb Wire,NULL,NULL,200.00
+>>> ALLOC PPF001 LineItem PPF001,5,9.95,NULL
+>>> PRTALL
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d0da        37      1    0176D0DF
+			Attr Name      Type Value     
+			productId        S  PPF001
+			iQtyReq          I  5
+			dCost            D  9.950000
+			pNextItem        P  00000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d0a5        53      0    0176D0AA
+			Attr Name      Type Value     
+			customerId       S  222
+			name             S  Barb Wire
+			pFirstItem       P  00000000
+			pNextCust        P  00000000
+			balance          D  200.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d070        53      0    0176D075
+			Attr Name      Type Value     
+			customerId       S  111
+			name             S  Sal A Mander
+			pFirstItem       P  00000000
+			pNextCust        P  00000000
+			balance          D  100.000000
+
+*
+* associate customer 111 with a next pointing to 222
+*
+>>> ASSOC C111 pNextCust C222
+* customer 111's  pNextCust should point to 222
+>>> PRTNODE C111 
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d070        53      0    0176D075
+			Attr Name      Type Value     
+			customerId       S  111
+			name             S  Sal A Mander
+			pFirstItem       P  00000000
+			pNextCust        P  0176D0AA
+			balance          D  100.000000
+*
+* associate customer 111 to PPF001
+*
+>>> ASSOC C111 pFirstItem PPF001
+>>> PRTNODE C111
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d070        53      0    0176D075
+			Attr Name      Type Value     
+			customerId       S  111
+			name             S  Sal A Mander
+			pFirstItem       P  0176D0DF
+			pNextCust        P  0176D0AA
+			balance          D  100.000000
+* associate customer 222 to 333
+>>> ALLOC C333 Customer 333,Misty Wind,NULL,NULL,70.00
+>>> ASSOC C222 pNextCust C333
+*
+* 111 should point to 222 which points to 333
+* 111 should also point to PPF001
+*
+>>> PRTALL
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d0da        37      1    0176D0DF
+			Attr Name      Type Value     
+			productId        S  PPF001
+			iQtyReq          I  5
+			dCost            D  9.950000
+			pNextItem        P  00000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d0ff        53      0    0176D104
+			Attr Name      Type Value     
+			customerId       S  333
+			name             S  Misty Wind
+			pFirstItem       P  00000000
+			pNextCust        P  00000000
+			balance          D  70.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d0a5        53      0    0176D0AA
+			Attr Name      Type Value     
+			customerId       S  222
+			name             S  Barb Wire
+			pFirstItem       P  00000000
+			pNextCust        P  0176D104
+			balance          D  200.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d070        53      0    0176D075
+			Attr Name      Type Value     
+			customerId       S  111
+			name             S  Sal A Mander
+			pFirstItem       P  0176D0DF
+			pNextCust        P  0176D0AA
+			balance          D  100.000000
+
+* add another customer
+>>> ALLOC C444 Customer 444,Emory Board,NULL,NULL,44.44
+>>> ASSOC C333 pNextCust C444
+>>> DUMP
+	Address  Mem   Size NodeType
+	0176D070 InUse   53   0
+			   0176D075 1  1  1  .  .  .  .  .  S  a  l     A     M  a  n  d  e  r  
+			            31 31 31 00 00 00 00 00 53 61 6C 20 41 20 4D 61 6E 64 65 72 
+			   0176D089 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 DF D0 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D09D .  .  .  .  .  .  Y  @  
+			            00 00 00 00 00 00 59 40 
+	0176D0A5 InUse   53   0
+			   0176D0AA 2  2  2  .  .  .  .  .  B  a  r  b     W  i  r  e  .  .  .  
+			            32 32 32 00 00 00 00 00 42 61 72 62 20 57 69 72 65 00 00 00 
+			   0176D0BE .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 04 D1 76 01 00 00 00 00 
+			   0176D0D2 .  .  .  .  .  .  i  @  
+			            00 00 00 00 00 00 69 40 
+	0176D0DA InUse   37   1
+			   0176D0DF P  P  F  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            50 50 46 30 30 31 00 00 00 00 00 00 05 00 00 00 66 66 66 66 
+			   0176D0F3 f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D0FF InUse   53   0
+			   0176D104 3  3  3  .  .  .  .  .  M  i  s  t  y     W  i  n  d  .  .  
+			            33 33 33 00 00 00 00 00 4D 69 73 74 79 20 57 69 6E 64 00 00 
+			   0176D118 .  .  .  .  .  .  .  .  .  .  .  .  9  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 39 D1 76 01 00 00 00 00 
+			   0176D12C .  .  .  .  .  .  Q  @  
+			            00 00 00 00 00 80 51 40 
+	0176D134 InUse   53   0
+			   0176D139 4  4  4  .  .  .  .  .  E  m  o  r  y     B  o  a  r  d  .  
+			            34 34 34 00 00 00 00 00 45 6D 6F 72 79 20 42 6F 61 72 64 00 
+			   0176D14D thru 0176D160 (1 lines) suppressed - all zero
+			   0176D161 .  .  .  .  Q  8  F  @  
+			            B8 1E 85 EB 51 38 46 40 
+	0176D169 Free   651
+			Next:00000000
+*
+* Allocate another node and associate it with 222
+* Allocate another line item and associate 555 to it
+*
+>>> ALLOC C555 Customer 555,Holly Graph,NULL,NULL,55.00
+>>> ASSOC C555 pNextCust C222
+>>> ALLOC SBB001 LineItem SBB001,2,19.95,NULL
+>>> ASSOC C555 pFirstItem SBB001
+*
+* assoc the line items 
+*
+>>> ALLOC BOM001 LineItem BOM001,1,29.95,NULL
+>>> ASSOC SBB001 pNextItem BOM001
+*
+>>> ALLOC C666 Customer 666,Bob L Head,NULL,NULL,66.00
+>>> ASSOC C444 pNextCust C666
+*
+* Assoc C444 with a different customer, 
+* causing the old customer assoc (C666) to not be associated
+*
+>>> ALLOC C777 Customer 777,Flo N Water,NULL,NULL,77.00
+>>> ASSOC C444 pNextCust C777
+*
+* Add many customers and line items
+*
+>>> ALLOC C888 Customer 888,Joe King,NULL,NULL,88.00
+>>> ALLOC C911 Customer 911,Lee King,NULL,NULL,91.00
+>>> ALLOC C922 Customer 922,Mae King,NULL,NULL,92.00
+>>> ALLOC MCW001 LineItem MCW001,1,12.45,NULL
+>>> ALLOC C933 Customer 933,Ray King,NULL,NULL,93.00
+>>> ALLOC C944 Customer 944,Freida King,NULL,NULL,94.00
+>>> ALLOC SSX001 LineItem SSX001,1,29.95,NULL
+>>> ASSOC MCW001 pNextItem SSX001
+>>> ALLOC TTP001 LineItem TTP001,2,9.95,NULL
+>>> DEREF SSX001
+>>> DUMP
+	Address  Mem   Size NodeType
+	0176D070 InUse   53   0
+			   0176D075 1  1  1  .  .  .  .  .  S  a  l     A     M  a  n  d  e  r  
+			            31 31 31 00 00 00 00 00 53 61 6C 20 41 20 4D 61 6E 64 65 72 
+			   0176D089 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 DF D0 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D09D .  .  .  .  .  .  Y  @  
+			            00 00 00 00 00 00 59 40 
+	0176D0A5 InUse   53   0
+			   0176D0AA 2  2  2  .  .  .  .  .  B  a  r  b     W  i  r  e  .  .  .  
+			            32 32 32 00 00 00 00 00 42 61 72 62 20 57 69 72 65 00 00 00 
+			   0176D0BE .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 04 D1 76 01 00 00 00 00 
+			   0176D0D2 .  .  .  .  .  .  i  @  
+			            00 00 00 00 00 00 69 40 
+	0176D0DA InUse   37   1
+			   0176D0DF P  P  F  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            50 50 46 30 30 31 00 00 00 00 00 00 05 00 00 00 66 66 66 66 
+			   0176D0F3 f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D0FF InUse   53   0
+			   0176D104 3  3  3  .  .  .  .  .  M  i  s  t  y     W  i  n  d  .  .  
+			            33 33 33 00 00 00 00 00 4D 69 73 74 79 20 57 69 6E 64 00 00 
+			   0176D118 .  .  .  .  .  .  .  .  .  .  .  .  9  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 39 D1 76 01 00 00 00 00 
+			   0176D12C .  .  .  .  .  .  Q  @  
+			            00 00 00 00 00 80 51 40 
+	0176D134 InUse   53   0
+			   0176D139 4  4  4  .  .  .  .  .  E  m  o  r  y     B  o  a  r  d  .  
+			            34 34 34 00 00 00 00 00 45 6D 6F 72 79 20 42 6F 61 72 64 00 
+			   0176D14D .  .  .  .  .  .  .  .  .  .  .  .  "  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 22 D2 76 01 00 00 00 00 
+			   0176D161 .  .  .  .  Q  8  F  @  
+			            B8 1E 85 EB 51 38 46 40 
+	0176D169 InUse   53   0
+			   0176D16E 5  5  5  .  .  .  .  .  H  o  l  l  y     G  r  a  p  h  .  
+			            35 35 35 00 00 00 00 00 48 6F 6C 6C 79 20 47 72 61 70 68 00 
+			   0176D182 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 A3 D1 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D196 .  .  .  .  .  .  K  @  
+			            00 00 00 00 00 80 4B 40 
+	0176D19E InUse   37   1
+			   0176D1A3 S  B  B  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 42 42 30 30 31 00 00 00 00 00 00 02 00 00 00 33 33 33 33 
+			   0176D1B7 3  .  3  @  .  .  v  .  .  .  .  .  
+			            33 F3 33 40 C8 D1 76 01 00 00 00 00 
+	0176D1C3 InUse   37   1
+			   0176D1C8 B  O  M  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            42 4F 4D 30 30 31 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D1DC 3  .  =  @  .  .  .  .  .  .  .  .  
+			            33 F3 3D 40 00 00 00 00 00 00 00 00 
+	0176D1E8 InUse   53   0
+			   0176D1ED 6  6  6  .  .  .  .  .  B  o  b     L     H  e  a  d  .  .  
+			            36 36 36 00 00 00 00 00 42 6F 62 20 4C 20 48 65 61 64 00 00 
+			   0176D201 thru 0176D214 (1 lines) suppressed - all zero
+			   0176D215 .  .  .  .  .  .  P  @  
+			            00 00 00 00 00 80 50 40 
+	0176D21D InUse   53   0
+			   0176D222 7  7  7  .  .  .  .  .  F  l  o     N     W  a  t  e  r  .  
+			            37 37 37 00 00 00 00 00 46 6C 6F 20 4E 20 57 61 74 65 72 00 
+			   0176D236 thru 0176D249 (1 lines) suppressed - all zero
+			   0176D24A .  .  .  .  .  @  S  @  
+			            00 00 00 00 00 40 53 40 
+	0176D252 InUse   53   0
+			   0176D257 8  8  8  .  .  .  .  .  J  o  e     K  i  n  g  .  .  .  .  
+			            38 38 38 00 00 00 00 00 4A 6F 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D26B thru 0176D27E (1 lines) suppressed - all zero
+			   0176D27F .  .  .  .  .  .  V  @  
+			            00 00 00 00 00 00 56 40 
+	0176D287 InUse   53   0
+			   0176D28C 9  1  1  .  .  .  .  .  L  e  e     K  i  n  g  .  .  .  .  
+			            39 31 31 00 00 00 00 00 4C 65 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2A0 thru 0176D2B3 (1 lines) suppressed - all zero
+			   0176D2B4 .  .  .  .  .  .  V  @  
+			            00 00 00 00 00 C0 56 40 
+	0176D2BC InUse   53   0
+			   0176D2C1 9  2  2  .  .  .  .  .  M  a  e     K  i  n  g  .  .  .  .  
+			            39 32 32 00 00 00 00 00 4D 61 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2D5 thru 0176D2E8 (1 lines) suppressed - all zero
+			   0176D2E9 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 00 57 40 
+	0176D2F1 InUse   37   1
+			   0176D2F6 M  C  W  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            4D 43 57 30 30 31 00 00 00 00 00 00 01 00 00 00 66 66 66 66 
+			   0176D30A f  .  (  @  .  .  v  .  .  .  .  .  
+			            66 E6 28 40 85 D3 76 01 00 00 00 00 
+	0176D316 InUse   53   0
+			   0176D31B 9  3  3  .  .  .  .  .  R  a  y     K  i  n  g  .  .  .  .  
+			            39 33 33 00 00 00 00 00 52 61 79 20 4B 69 6E 67 00 00 00 00 
+			   0176D32F thru 0176D342 (1 lines) suppressed - all zero
+			   0176D343 .  .  .  .  .  @  W  @  
+			            00 00 00 00 00 40 57 40 
+	0176D34B InUse   53   0
+			   0176D350 9  4  4  .  .  .  .  .  F  r  e  i  d  a     K  i  n  g  .  
+			            39 34 34 00 00 00 00 00 46 72 65 69 64 61 20 4B 69 6E 67 00 
+			   0176D364 thru 0176D377 (1 lines) suppressed - all zero
+			   0176D378 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 80 57 40 
+	0176D380 InUse   37   1
+			   0176D385 S  S  X  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 53 58 30 30 31 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D399 3  .  =  @  .  .  .  .  .  .  .  .  
+			            33 F3 3D 40 00 00 00 00 00 00 00 00 
+	0176D3A5 InUse   37   1
+			   0176D3AA T  T  P  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            54 54 50 30 30 31 00 00 00 00 00 00 02 00 00 00 66 66 66 66 
+			   0176D3BE f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D3CA Free    42
+			Next:00000000
+*
+* XXXXXX 1
+* This line item is smaller than the last free node;
+* however, the remaining free size is too small for a
+* free node.  We give NHC001 all of the free node's
+* size as its size.
+>>> ALLOC NHC001 LineItem NHC001,1,9.95,NULL
+>>> PRTALL
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d34b        53      0    0176D350
+			Attr Name      Type Value     
+			customerId       S  944
+			name             S  Freida King
+			pFirstItem       P  00000000
+			pNextCust        P  00000000
+			balance          D  94.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d2f1        37      1    0176D2F6
+			Attr Name      Type Value     
+			productId        S  MCW001
+			iQtyReq          I  1
+			dCost            D  12.450000
+			pNextItem        P  0176D385
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d287        53      0    0176D28C
+			Attr Name      Type Value     
+			customerId       S  911
+			name             S  Lee King
+			pFirstItem       P  00000000
+			pNextCust        P  00000000
+			balance          D  91.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d252        53      0    0176D257
+			Attr Name      Type Value     
+			customerId       S  888
+			name             S  Joe King
+			pFirstItem       P  00000000
+			pNextCust        P  00000000
+			balance          D  88.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d2bc        53      0    0176D2C1
+			Attr Name      Type Value     
+			customerId       S  922
+			name             S  Mae King
+			pFirstItem       P  00000000
+			pNextCust        P  00000000
+			balance          D  92.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d0a5        53      0    0176D0AA
+			Attr Name      Type Value     
+			customerId       S  222
+			name             S  Barb Wire
+			pFirstItem       P  00000000
+			pNextCust        P  0176D104
+			balance          D  200.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d0ff        53      0    0176D104
+			Attr Name      Type Value     
+			customerId       S  333
+			name             S  Misty Wind
+			pFirstItem       P  00000000
+			pNextCust        P  0176D139
+			balance          D  70.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d070        53      0    0176D075
+			Attr Name      Type Value     
+			customerId       S  111
+			name             S  Sal A Mander
+			pFirstItem       P  0176D0DF
+			pNextCust        P  0176D0AA
+			balance          D  100.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d169        53      0    0176D16E
+			Attr Name      Type Value     
+			customerId       S  555
+			name             S  Holly Graph
+			pFirstItem       P  0176D1A3
+			pNextCust        P  0176D0AA
+			balance          D  55.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d1c3        37      1    0176D1C8
+			Attr Name      Type Value     
+			productId        S  BOM001
+			iQtyReq          I  1
+			dCost            D  29.950000
+			pNextItem        P  00000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d316        53      0    0176D31B
+			Attr Name      Type Value     
+			customerId       S  933
+			name             S  Ray King
+			pFirstItem       P  00000000
+			pNextCust        P  00000000
+			balance          D  93.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d0da        37      1    0176D0DF
+			Attr Name      Type Value     
+			productId        S  PPF001
+			iQtyReq          I  5
+			dCost            D  9.950000
+			pNextItem        P  00000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d3ca        42      1    0176D3CF
+			Attr Name      Type Value     
+			productId        S  NHC001
+			iQtyReq          I  1
+			dCost            D  9.950000
+			pNextItem        P  00000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d3a5        37      1    0176D3AA
+			Attr Name      Type Value     
+			productId        S  TTP001
+			iQtyReq          I  2
+			dCost            D  9.950000
+			pNextItem        P  00000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d134        53      0    0176D139
+			Attr Name      Type Value     
+			customerId       S  444
+			name             S  Emory Board
+			pFirstItem       P  00000000
+			pNextCust        P  0176D222
+			balance          D  44.440000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d19e        37      1    0176D1A3
+			Attr Name      Type Value     
+			productId        S  SBB001
+			iQtyReq          I  2
+			dCost            D  19.950000
+			pNextItem        P  0176D1C8
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d1e8        53      0    0176D1ED
+			Attr Name      Type Value     
+			customerId       S  666
+			name             S  Bob L Head
+			pFirstItem       P  00000000
+			pNextCust        P  00000000
+			balance          D  66.000000
+	Alloc Address  Size Node Type Data Address  
+ 	0x176d21d        53      0    0176D222
+			Attr Name      Type Value     
+			customerId       S  777
+			name             S  Flo N Water
+			pFirstItem       P  00000000
+			pNextCust        P  00000000
+			balance          D  77.000000
+
+*
+* XXXXXX 2
+* Do a Garbage Collection ... should not collect anything
+* Note that SSX001 is still referenced by a linked list
+* so it shouldn't be freed.
+* 
+>>> DUMP
+	Address  Mem   Size NodeType
+	0176D070 InUse   53   0
+			   0176D075 1  1  1  .  .  .  .  .  S  a  l     A     M  a  n  d  e  r  
+			            31 31 31 00 00 00 00 00 53 61 6C 20 41 20 4D 61 6E 64 65 72 
+			   0176D089 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 DF D0 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D09D .  .  .  .  .  .  Y  @  
+			            00 00 00 00 00 00 59 40 
+	0176D0A5 InUse   53   0
+			   0176D0AA 2  2  2  .  .  .  .  .  B  a  r  b     W  i  r  e  .  .  .  
+			            32 32 32 00 00 00 00 00 42 61 72 62 20 57 69 72 65 00 00 00 
+			   0176D0BE .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 04 D1 76 01 00 00 00 00 
+			   0176D0D2 .  .  .  .  .  .  i  @  
+			            00 00 00 00 00 00 69 40 
+	0176D0DA InUse   37   1
+			   0176D0DF P  P  F  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            50 50 46 30 30 31 00 00 00 00 00 00 05 00 00 00 66 66 66 66 
+			   0176D0F3 f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D0FF InUse   53   0
+			   0176D104 3  3  3  .  .  .  .  .  M  i  s  t  y     W  i  n  d  .  .  
+			            33 33 33 00 00 00 00 00 4D 69 73 74 79 20 57 69 6E 64 00 00 
+			   0176D118 .  .  .  .  .  .  .  .  .  .  .  .  9  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 39 D1 76 01 00 00 00 00 
+			   0176D12C .  .  .  .  .  .  Q  @  
+			            00 00 00 00 00 80 51 40 
+	0176D134 InUse   53   0
+			   0176D139 4  4  4  .  .  .  .  .  E  m  o  r  y     B  o  a  r  d  .  
+			            34 34 34 00 00 00 00 00 45 6D 6F 72 79 20 42 6F 61 72 64 00 
+			   0176D14D .  .  .  .  .  .  .  .  .  .  .  .  "  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 22 D2 76 01 00 00 00 00 
+			   0176D161 .  .  .  .  Q  8  F  @  
+			            B8 1E 85 EB 51 38 46 40 
+	0176D169 InUse   53   0
+			   0176D16E 5  5  5  .  .  .  .  .  H  o  l  l  y     G  r  a  p  h  .  
+			            35 35 35 00 00 00 00 00 48 6F 6C 6C 79 20 47 72 61 70 68 00 
+			   0176D182 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 A3 D1 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D196 .  .  .  .  .  .  K  @  
+			            00 00 00 00 00 80 4B 40 
+	0176D19E InUse   37   1
+			   0176D1A3 S  B  B  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 42 42 30 30 31 00 00 00 00 00 00 02 00 00 00 33 33 33 33 
+			   0176D1B7 3  .  3  @  .  .  v  .  .  .  .  .  
+			            33 F3 33 40 C8 D1 76 01 00 00 00 00 
+	0176D1C3 InUse   37   1
+			   0176D1C8 B  O  M  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            42 4F 4D 30 30 31 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D1DC 3  .  =  @  .  .  .  .  .  .  .  .  
+			            33 F3 3D 40 00 00 00 00 00 00 00 00 
+	0176D1E8 InUse   53   0
+			   0176D1ED 6  6  6  .  .  .  .  .  B  o  b     L     H  e  a  d  .  .  
+			            36 36 36 00 00 00 00 00 42 6F 62 20 4C 20 48 65 61 64 00 00 
+			   0176D201 thru 0176D214 (1 lines) suppressed - all zero
+			   0176D215 .  .  .  .  .  .  P  @  
+			            00 00 00 00 00 80 50 40 
+	0176D21D InUse   53   0
+			   0176D222 7  7  7  .  .  .  .  .  F  l  o     N     W  a  t  e  r  .  
+			            37 37 37 00 00 00 00 00 46 6C 6F 20 4E 20 57 61 74 65 72 00 
+			   0176D236 thru 0176D249 (1 lines) suppressed - all zero
+			   0176D24A .  .  .  .  .  @  S  @  
+			            00 00 00 00 00 40 53 40 
+	0176D252 InUse   53   0
+			   0176D257 8  8  8  .  .  .  .  .  J  o  e     K  i  n  g  .  .  .  .  
+			            38 38 38 00 00 00 00 00 4A 6F 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D26B thru 0176D27E (1 lines) suppressed - all zero
+			   0176D27F .  .  .  .  .  .  V  @  
+			            00 00 00 00 00 00 56 40 
+	0176D287 InUse   53   0
+			   0176D28C 9  1  1  .  .  .  .  .  L  e  e     K  i  n  g  .  .  .  .  
+			            39 31 31 00 00 00 00 00 4C 65 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2A0 thru 0176D2B3 (1 lines) suppressed - all zero
+			   0176D2B4 .  .  .  .  .  .  V  @  
+			            00 00 00 00 00 C0 56 40 
+	0176D2BC InUse   53   0
+			   0176D2C1 9  2  2  .  .  .  .  .  M  a  e     K  i  n  g  .  .  .  .  
+			            39 32 32 00 00 00 00 00 4D 61 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2D5 thru 0176D2E8 (1 lines) suppressed - all zero
+			   0176D2E9 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 00 57 40 
+	0176D2F1 InUse   37   1
+			   0176D2F6 M  C  W  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            4D 43 57 30 30 31 00 00 00 00 00 00 01 00 00 00 66 66 66 66 
+			   0176D30A f  .  (  @  .  .  v  .  .  .  .  .  
+			            66 E6 28 40 85 D3 76 01 00 00 00 00 
+	0176D316 InUse   53   0
+			   0176D31B 9  3  3  .  .  .  .  .  R  a  y     K  i  n  g  .  .  .  .  
+			            39 33 33 00 00 00 00 00 52 61 79 20 4B 69 6E 67 00 00 00 00 
+			   0176D32F thru 0176D342 (1 lines) suppressed - all zero
+			   0176D343 .  .  .  .  .  @  W  @  
+			            00 00 00 00 00 40 57 40 
+	0176D34B InUse   53   0
+			   0176D350 9  4  4  .  .  .  .  .  F  r  e  i  d  a     K  i  n  g  .  
+			            39 34 34 00 00 00 00 00 46 72 65 69 64 61 20 4B 69 6E 67 00 
+			   0176D364 thru 0176D377 (1 lines) suppressed - all zero
+			   0176D378 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 80 57 40 
+	0176D380 InUse   37   1
+			   0176D385 S  S  X  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 53 58 30 30 31 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D399 3  .  =  @  .  .  .  .  .  .  .  .  
+			            33 F3 3D 40 00 00 00 00 00 00 00 00 
+	0176D3A5 InUse   37   1
+			   0176D3AA T  T  P  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            54 54 50 30 30 31 00 00 00 00 00 00 02 00 00 00 66 66 66 66 
+			   0176D3BE f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D3CA InUse   42   1
+			   0176D3CF N  H  C  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            4E 48 43 30 30 31 00 00 00 00 00 00 01 00 00 00 66 66 66 66 
+			   0176D3E3 f  .  #  @  .  .  .  .  .  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 00 00 00 00 00 
+>>> GCOLL
+>>> DUMP
+	Address  Mem   Size NodeType
+	0176D070 InUse   53   0
+			   0176D075 1  1  1  .  .  .  .  .  S  a  l     A     M  a  n  d  e  r  
+			            31 31 31 00 00 00 00 00 53 61 6C 20 41 20 4D 61 6E 64 65 72 
+			   0176D089 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 DF D0 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D09D .  .  .  .  .  .  Y  @  
+			            00 00 00 00 00 00 59 40 
+	0176D0A5 InUse   53   0
+			   0176D0AA 2  2  2  .  .  .  .  .  B  a  r  b     W  i  r  e  .  .  .  
+			            32 32 32 00 00 00 00 00 42 61 72 62 20 57 69 72 65 00 00 00 
+			   0176D0BE .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 04 D1 76 01 00 00 00 00 
+			   0176D0D2 .  .  .  .  .  .  i  @  
+			            00 00 00 00 00 00 69 40 
+	0176D0DA InUse   37   1
+			   0176D0DF P  P  F  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            50 50 46 30 30 31 00 00 00 00 00 00 05 00 00 00 66 66 66 66 
+			   0176D0F3 f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D0FF InUse   53   0
+			   0176D104 3  3  3  .  .  .  .  .  M  i  s  t  y     W  i  n  d  .  .  
+			            33 33 33 00 00 00 00 00 4D 69 73 74 79 20 57 69 6E 64 00 00 
+			   0176D118 .  .  .  .  .  .  .  .  .  .  .  .  9  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 39 D1 76 01 00 00 00 00 
+			   0176D12C .  .  .  .  .  .  Q  @  
+			            00 00 00 00 00 80 51 40 
+	0176D134 InUse   53   0
+			   0176D139 4  4  4  .  .  .  .  .  E  m  o  r  y     B  o  a  r  d  .  
+			            34 34 34 00 00 00 00 00 45 6D 6F 72 79 20 42 6F 61 72 64 00 
+			   0176D14D .  .  .  .  .  .  .  .  .  .  .  .  "  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 22 D2 76 01 00 00 00 00 
+			   0176D161 .  .  .  .  Q  8  F  @  
+			            B8 1E 85 EB 51 38 46 40 
+	0176D169 InUse   53   0
+			   0176D16E 5  5  5  .  .  .  .  .  H  o  l  l  y     G  r  a  p  h  .  
+			            35 35 35 00 00 00 00 00 48 6F 6C 6C 79 20 47 72 61 70 68 00 
+			   0176D182 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 A3 D1 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D196 .  .  .  .  .  .  K  @  
+			            00 00 00 00 00 80 4B 40 
+	0176D19E InUse   37   1
+			   0176D1A3 S  B  B  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 42 42 30 30 31 00 00 00 00 00 00 02 00 00 00 33 33 33 33 
+			   0176D1B7 3  .  3  @  .  .  v  .  .  .  .  .  
+			            33 F3 33 40 C8 D1 76 01 00 00 00 00 
+	0176D1C3 InUse   37   1
+			   0176D1C8 B  O  M  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            42 4F 4D 30 30 31 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D1DC 3  .  =  @  .  .  .  .  .  .  .  .  
+			            33 F3 3D 40 00 00 00 00 00 00 00 00 
+	0176D1E8 InUse   53   0
+			   0176D1ED 6  6  6  .  .  .  .  .  B  o  b     L     H  e  a  d  .  .  
+			            36 36 36 00 00 00 00 00 42 6F 62 20 4C 20 48 65 61 64 00 00 
+			   0176D201 thru 0176D214 (1 lines) suppressed - all zero
+			   0176D215 .  .  .  .  .  .  P  @  
+			            00 00 00 00 00 80 50 40 
+	0176D21D InUse   53   0
+			   0176D222 7  7  7  .  .  .  .  .  F  l  o     N     W  a  t  e  r  .  
+			            37 37 37 00 00 00 00 00 46 6C 6F 20 4E 20 57 61 74 65 72 00 
+			   0176D236 thru 0176D249 (1 lines) suppressed - all zero
+			   0176D24A .  .  .  .  .  @  S  @  
+			            00 00 00 00 00 40 53 40 
+	0176D252 InUse   53   0
+			   0176D257 8  8  8  .  .  .  .  .  J  o  e     K  i  n  g  .  .  .  .  
+			            38 38 38 00 00 00 00 00 4A 6F 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D26B thru 0176D27E (1 lines) suppressed - all zero
+			   0176D27F .  .  .  .  .  .  V  @  
+			            00 00 00 00 00 00 56 40 
+	0176D287 InUse   53   0
+			   0176D28C 9  1  1  .  .  .  .  .  L  e  e     K  i  n  g  .  .  .  .  
+			            39 31 31 00 00 00 00 00 4C 65 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2A0 thru 0176D2B3 (1 lines) suppressed - all zero
+			   0176D2B4 .  .  .  .  .  .  V  @  
+			            00 00 00 00 00 C0 56 40 
+	0176D2BC InUse   53   0
+			   0176D2C1 9  2  2  .  .  .  .  .  M  a  e     K  i  n  g  .  .  .  .  
+			            39 32 32 00 00 00 00 00 4D 61 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2D5 thru 0176D2E8 (1 lines) suppressed - all zero
+			   0176D2E9 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 00 57 40 
+	0176D2F1 InUse   37   1
+			   0176D2F6 M  C  W  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            4D 43 57 30 30 31 00 00 00 00 00 00 01 00 00 00 66 66 66 66 
+			   0176D30A f  .  (  @  .  .  v  .  .  .  .  .  
+			            66 E6 28 40 85 D3 76 01 00 00 00 00 
+	0176D316 InUse   53   0
+			   0176D31B 9  3  3  .  .  .  .  .  R  a  y     K  i  n  g  .  .  .  .  
+			            39 33 33 00 00 00 00 00 52 61 79 20 4B 69 6E 67 00 00 00 00 
+			   0176D32F thru 0176D342 (1 lines) suppressed - all zero
+			   0176D343 .  .  .  .  .  @  W  @  
+			            00 00 00 00 00 40 57 40 
+	0176D34B InUse   53   0
+			   0176D350 9  4  4  .  .  .  .  .  F  r  e  i  d  a     K  i  n  g  .  
+			            39 34 34 00 00 00 00 00 46 72 65 69 64 61 20 4B 69 6E 67 00 
+			   0176D364 thru 0176D377 (1 lines) suppressed - all zero
+			   0176D378 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 80 57 40 
+	0176D380 InUse   37   1
+			   0176D385 S  S  X  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 53 58 30 30 31 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D399 3  .  =  @  .  .  .  .  .  .  .  .  
+			            33 F3 3D 40 00 00 00 00 00 00 00 00 
+	0176D3A5 InUse   37   1
+			   0176D3AA T  T  P  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            54 54 50 30 30 31 00 00 00 00 00 00 02 00 00 00 66 66 66 66 
+			   0176D3BE f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D3CA InUse   42   1
+			   0176D3CF N  H  C  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            4E 48 43 30 30 31 00 00 00 00 00 00 01 00 00 00 66 66 66 66 
+			   0176D3E3 f  .  #  @  .  .  .  .  .  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 00 00 00 00 00 
+*
+* Remove our reference to the beginning of the linked list
+*
+>>> DEREF MCW001
+*
+* XXXXXX 3
+* Do a Garbage Collection which will gain two free areas
+*
+>>> GCOLL
+	Collecting 0176D2F1
+	Collecting 0176D380
+>>> DUMP
+	Address  Mem   Size NodeType
+	0176D070 InUse   53   0
+			   0176D075 1  1  1  .  .  .  .  .  S  a  l     A     M  a  n  d  e  r  
+			            31 31 31 00 00 00 00 00 53 61 6C 20 41 20 4D 61 6E 64 65 72 
+			   0176D089 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 DF D0 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D09D .  .  .  .  .  .  Y  @  
+			            00 00 00 00 00 00 59 40 
+	0176D0A5 InUse   53   0
+			   0176D0AA 2  2  2  .  .  .  .  .  B  a  r  b     W  i  r  e  .  .  .  
+			            32 32 32 00 00 00 00 00 42 61 72 62 20 57 69 72 65 00 00 00 
+			   0176D0BE .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 04 D1 76 01 00 00 00 00 
+			   0176D0D2 .  .  .  .  .  .  i  @  
+			            00 00 00 00 00 00 69 40 
+	0176D0DA InUse   37   1
+			   0176D0DF P  P  F  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            50 50 46 30 30 31 00 00 00 00 00 00 05 00 00 00 66 66 66 66 
+			   0176D0F3 f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D0FF InUse   53   0
+			   0176D104 3  3  3  .  .  .  .  .  M  i  s  t  y     W  i  n  d  .  .  
+			            33 33 33 00 00 00 00 00 4D 69 73 74 79 20 57 69 6E 64 00 00 
+			   0176D118 .  .  .  .  .  .  .  .  .  .  .  .  9  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 39 D1 76 01 00 00 00 00 
+			   0176D12C .  .  .  .  .  .  Q  @  
+			            00 00 00 00 00 80 51 40 
+	0176D134 InUse   53   0
+			   0176D139 4  4  4  .  .  .  .  .  E  m  o  r  y     B  o  a  r  d  .  
+			            34 34 34 00 00 00 00 00 45 6D 6F 72 79 20 42 6F 61 72 64 00 
+			   0176D14D .  .  .  .  .  .  .  .  .  .  .  .  "  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 22 D2 76 01 00 00 00 00 
+			   0176D161 .  .  .  .  Q  8  F  @  
+			            B8 1E 85 EB 51 38 46 40 
+	0176D169 InUse   53   0
+			   0176D16E 5  5  5  .  .  .  .  .  H  o  l  l  y     G  r  a  p  h  .  
+			            35 35 35 00 00 00 00 00 48 6F 6C 6C 79 20 47 72 61 70 68 00 
+			   0176D182 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 A3 D1 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D196 .  .  .  .  .  .  K  @  
+			            00 00 00 00 00 80 4B 40 
+	0176D19E InUse   37   1
+			   0176D1A3 S  B  B  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 42 42 30 30 31 00 00 00 00 00 00 02 00 00 00 33 33 33 33 
+			   0176D1B7 3  .  3  @  .  .  v  .  .  .  .  .  
+			            33 F3 33 40 C8 D1 76 01 00 00 00 00 
+	0176D1C3 InUse   37   1
+			   0176D1C8 B  O  M  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            42 4F 4D 30 30 31 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D1DC 3  .  =  @  .  .  .  .  .  .  .  .  
+			            33 F3 3D 40 00 00 00 00 00 00 00 00 
+	0176D1E8 InUse   53   0
+			   0176D1ED 6  6  6  .  .  .  .  .  B  o  b     L     H  e  a  d  .  .  
+			            36 36 36 00 00 00 00 00 42 6F 62 20 4C 20 48 65 61 64 00 00 
+			   0176D201 thru 0176D214 (1 lines) suppressed - all zero
+			   0176D215 .  .  .  .  .  .  P  @  
+			            00 00 00 00 00 80 50 40 
+	0176D21D InUse   53   0
+			   0176D222 7  7  7  .  .  .  .  .  F  l  o     N     W  a  t  e  r  .  
+			            37 37 37 00 00 00 00 00 46 6C 6F 20 4E 20 57 61 74 65 72 00 
+			   0176D236 thru 0176D249 (1 lines) suppressed - all zero
+			   0176D24A .  .  .  .  .  @  S  @  
+			            00 00 00 00 00 40 53 40 
+	0176D252 InUse   53   0
+			   0176D257 8  8  8  .  .  .  .  .  J  o  e     K  i  n  g  .  .  .  .  
+			            38 38 38 00 00 00 00 00 4A 6F 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D26B thru 0176D27E (1 lines) suppressed - all zero
+			   0176D27F .  .  .  .  .  .  V  @  
+			            00 00 00 00 00 00 56 40 
+	0176D287 InUse   53   0
+			   0176D28C 9  1  1  .  .  .  .  .  L  e  e     K  i  n  g  .  .  .  .  
+			            39 31 31 00 00 00 00 00 4C 65 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2A0 thru 0176D2B3 (1 lines) suppressed - all zero
+			   0176D2B4 .  .  .  .  .  .  V  @  
+			            00 00 00 00 00 C0 56 40 
+	0176D2BC InUse   53   0
+			   0176D2C1 9  2  2  .  .  .  .  .  M  a  e     K  i  n  g  .  .  .  .  
+			            39 32 32 00 00 00 00 00 4D 61 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2D5 thru 0176D2E8 (1 lines) suppressed - all zero
+			   0176D2E9 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 00 57 40 
+	0176D2F1 Free    37
+			Next:00000000
+	0176D316 InUse   53   0
+			   0176D31B 9  3  3  .  .  .  .  .  R  a  y     K  i  n  g  .  .  .  .  
+			            39 33 33 00 00 00 00 00 52 61 79 20 4B 69 6E 67 00 00 00 00 
+			   0176D32F thru 0176D342 (1 lines) suppressed - all zero
+			   0176D343 .  .  .  .  .  @  W  @  
+			            00 00 00 00 00 40 57 40 
+	0176D34B InUse   53   0
+			   0176D350 9  4  4  .  .  .  .  .  F  r  e  i  d  a     K  i  n  g  .  
+			            39 34 34 00 00 00 00 00 46 72 65 69 64 61 20 4B 69 6E 67 00 
+			   0176D364 thru 0176D377 (1 lines) suppressed - all zero
+			   0176D378 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 80 57 40 
+	0176D380 Free    37
+			Next:0176D2F1
+	0176D3A5 InUse   37   1
+			   0176D3AA T  T  P  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            54 54 50 30 30 31 00 00 00 00 00 00 02 00 00 00 66 66 66 66 
+			   0176D3BE f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D3CA InUse   42   1
+			   0176D3CF N  H  C  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            4E 48 43 30 30 31 00 00 00 00 00 00 01 00 00 00 66 66 66 66 
+			   0176D3E3 f  .  #  @  .  .  .  .  .  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 00 00 00 00 00 
+*
+* Remove some Hash Table references ... but some of these
+* will still be referenced by user pointers
+*
+>>> DEREF C888
+>>> DEREF C911
+>>> DEREF C333
+>>> DEREF C444
+>>> DEREF C666
+*
+* XXXXXX 4
+* Do a Garbage Collection which should find C666 to collect 
+*
+>>> GCOLL
+	Collecting 0176D1E8
+	Collecting 0176D252
+	Combining 0176D252 with 0176D287
+	Collecting 0176D2F1
+	Collecting 0176D380
+>>> DUMP
+	Address  Mem   Size NodeType
+	0176D070 InUse   53   0
+			   0176D075 1  1  1  .  .  .  .  .  S  a  l     A     M  a  n  d  e  r  
+			            31 31 31 00 00 00 00 00 53 61 6C 20 41 20 4D 61 6E 64 65 72 
+			   0176D089 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 DF D0 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D09D .  .  .  .  .  .  Y  @  
+			            00 00 00 00 00 00 59 40 
+	0176D0A5 InUse   53   0
+			   0176D0AA 2  2  2  .  .  .  .  .  B  a  r  b     W  i  r  e  .  .  .  
+			            32 32 32 00 00 00 00 00 42 61 72 62 20 57 69 72 65 00 00 00 
+			   0176D0BE .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 04 D1 76 01 00 00 00 00 
+			   0176D0D2 .  .  .  .  .  .  i  @  
+			            00 00 00 00 00 00 69 40 
+	0176D0DA InUse   37   1
+			   0176D0DF P  P  F  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            50 50 46 30 30 31 00 00 00 00 00 00 05 00 00 00 66 66 66 66 
+			   0176D0F3 f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D0FF InUse   53   0
+			   0176D104 3  3  3  .  .  .  .  .  M  i  s  t  y     W  i  n  d  .  .  
+			            33 33 33 00 00 00 00 00 4D 69 73 74 79 20 57 69 6E 64 00 00 
+			   0176D118 .  .  .  .  .  .  .  .  .  .  .  .  9  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 39 D1 76 01 00 00 00 00 
+			   0176D12C .  .  .  .  .  .  Q  @  
+			            00 00 00 00 00 80 51 40 
+	0176D134 InUse   53   0
+			   0176D139 4  4  4  .  .  .  .  .  E  m  o  r  y     B  o  a  r  d  .  
+			            34 34 34 00 00 00 00 00 45 6D 6F 72 79 20 42 6F 61 72 64 00 
+			   0176D14D .  .  .  .  .  .  .  .  .  .  .  .  "  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 22 D2 76 01 00 00 00 00 
+			   0176D161 .  .  .  .  Q  8  F  @  
+			            B8 1E 85 EB 51 38 46 40 
+	0176D169 InUse   53   0
+			   0176D16E 5  5  5  .  .  .  .  .  H  o  l  l  y     G  r  a  p  h  .  
+			            35 35 35 00 00 00 00 00 48 6F 6C 6C 79 20 47 72 61 70 68 00 
+			   0176D182 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 A3 D1 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D196 .  .  .  .  .  .  K  @  
+			            00 00 00 00 00 80 4B 40 
+	0176D19E InUse   37   1
+			   0176D1A3 S  B  B  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 42 42 30 30 31 00 00 00 00 00 00 02 00 00 00 33 33 33 33 
+			   0176D1B7 3  .  3  @  .  .  v  .  .  .  .  .  
+			            33 F3 33 40 C8 D1 76 01 00 00 00 00 
+	0176D1C3 InUse   37   1
+			   0176D1C8 B  O  M  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            42 4F 4D 30 30 31 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D1DC 3  .  =  @  .  .  .  .  .  .  .  .  
+			            33 F3 3D 40 00 00 00 00 00 00 00 00 
+	0176D1E8 Free    53
+			Next:00000000
+	0176D21D InUse   53   0
+			   0176D222 7  7  7  .  .  .  .  .  F  l  o     N     W  a  t  e  r  .  
+			            37 37 37 00 00 00 00 00 46 6C 6F 20 4E 20 57 61 74 65 72 00 
+			   0176D236 thru 0176D249 (1 lines) suppressed - all zero
+			   0176D24A .  .  .  .  .  @  S  @  
+			            00 00 00 00 00 40 53 40 
+	0176D252 Free   106
+			Next:0176D1E8
+	0176D2BC InUse   53   0
+			   0176D2C1 9  2  2  .  .  .  .  .  M  a  e     K  i  n  g  .  .  .  .  
+			            39 32 32 00 00 00 00 00 4D 61 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2D5 thru 0176D2E8 (1 lines) suppressed - all zero
+			   0176D2E9 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 00 57 40 
+	0176D2F1 Free    37
+			Next:0176D252
+	0176D316 InUse   53   0
+			   0176D31B 9  3  3  .  .  .  .  .  R  a  y     K  i  n  g  .  .  .  .  
+			            39 33 33 00 00 00 00 00 52 61 79 20 4B 69 6E 67 00 00 00 00 
+			   0176D32F thru 0176D342 (1 lines) suppressed - all zero
+			   0176D343 .  .  .  .  .  @  W  @  
+			            00 00 00 00 00 40 57 40 
+	0176D34B InUse   53   0
+			   0176D350 9  4  4  .  .  .  .  .  F  r  e  i  d  a     K  i  n  g  .  
+			            39 34 34 00 00 00 00 00 46 72 65 69 64 61 20 4B 69 6E 67 00 
+			   0176D364 thru 0176D377 (1 lines) suppressed - all zero
+			   0176D378 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 80 57 40 
+	0176D380 Free    37
+			Next:0176D2F1
+	0176D3A5 InUse   37   1
+			   0176D3AA T  T  P  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            54 54 50 30 30 31 00 00 00 00 00 00 02 00 00 00 66 66 66 66 
+			   0176D3BE f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D3CA InUse   42   1
+			   0176D3CF N  H  C  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            4E 48 43 30 30 31 00 00 00 00 00 00 01 00 00 00 66 66 66 66 
+			   0176D3E3 f  .  #  @  .  .  .  .  .  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 00 00 00 00 00 
+*
+* Create a circular list, should not cause problems for GCOLL
+*
+>>> ASSOC C777 pNextCust C222
+>>> DEREF C777
+>>> DEREF C222
+*
+* Do a Garbage Collection which shouldn't change anything
+* but should verify that student's code doesn't infinite loop
+*
+>>> GCOLL
+	Collecting 0176D1E8
+	Collecting 0176D252
+	Collecting 0176D2F1
+	Collecting 0176D380
+>>> DUMP
+	Address  Mem   Size NodeType
+	0176D070 InUse   53   0
+			   0176D075 1  1  1  .  .  .  .  .  S  a  l     A     M  a  n  d  e  r  
+			            31 31 31 00 00 00 00 00 53 61 6C 20 41 20 4D 61 6E 64 65 72 
+			   0176D089 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 DF D0 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D09D .  .  .  .  .  .  Y  @  
+			            00 00 00 00 00 00 59 40 
+	0176D0A5 InUse   53   0
+			   0176D0AA 2  2  2  .  .  .  .  .  B  a  r  b     W  i  r  e  .  .  .  
+			            32 32 32 00 00 00 00 00 42 61 72 62 20 57 69 72 65 00 00 00 
+			   0176D0BE .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 04 D1 76 01 00 00 00 00 
+			   0176D0D2 .  .  .  .  .  .  i  @  
+			            00 00 00 00 00 00 69 40 
+	0176D0DA InUse   37   1
+			   0176D0DF P  P  F  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            50 50 46 30 30 31 00 00 00 00 00 00 05 00 00 00 66 66 66 66 
+			   0176D0F3 f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D0FF InUse   53   0
+			   0176D104 3  3  3  .  .  .  .  .  M  i  s  t  y     W  i  n  d  .  .  
+			            33 33 33 00 00 00 00 00 4D 69 73 74 79 20 57 69 6E 64 00 00 
+			   0176D118 .  .  .  .  .  .  .  .  .  .  .  .  9  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 39 D1 76 01 00 00 00 00 
+			   0176D12C .  .  .  .  .  .  Q  @  
+			            00 00 00 00 00 80 51 40 
+	0176D134 InUse   53   0
+			   0176D139 4  4  4  .  .  .  .  .  E  m  o  r  y     B  o  a  r  d  .  
+			            34 34 34 00 00 00 00 00 45 6D 6F 72 79 20 42 6F 61 72 64 00 
+			   0176D14D .  .  .  .  .  .  .  .  .  .  .  .  "  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 22 D2 76 01 00 00 00 00 
+			   0176D161 .  .  .  .  Q  8  F  @  
+			            B8 1E 85 EB 51 38 46 40 
+	0176D169 InUse   53   0
+			   0176D16E 5  5  5  .  .  .  .  .  H  o  l  l  y     G  r  a  p  h  .  
+			            35 35 35 00 00 00 00 00 48 6F 6C 6C 79 20 47 72 61 70 68 00 
+			   0176D182 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 A3 D1 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D196 .  .  .  .  .  .  K  @  
+			            00 00 00 00 00 80 4B 40 
+	0176D19E InUse   37   1
+			   0176D1A3 S  B  B  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 42 42 30 30 31 00 00 00 00 00 00 02 00 00 00 33 33 33 33 
+			   0176D1B7 3  .  3  @  .  .  v  .  .  .  .  .  
+			            33 F3 33 40 C8 D1 76 01 00 00 00 00 
+	0176D1C3 InUse   37   1
+			   0176D1C8 B  O  M  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            42 4F 4D 30 30 31 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D1DC 3  .  =  @  .  .  .  .  .  .  .  .  
+			            33 F3 3D 40 00 00 00 00 00 00 00 00 
+	0176D1E8 Free    53
+			Next:00000000
+	0176D21D InUse   53   0
+			   0176D222 7  7  7  .  .  .  .  .  F  l  o     N     W  a  t  e  r  .  
+			            37 37 37 00 00 00 00 00 46 6C 6F 20 4E 20 57 61 74 65 72 00 
+			   0176D236 .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D24A .  .  .  .  .  @  S  @  
+			            00 00 00 00 00 40 53 40 
+	0176D252 Free   106
+			Next:0176D1E8
+	0176D2BC InUse   53   0
+			   0176D2C1 9  2  2  .  .  .  .  .  M  a  e     K  i  n  g  .  .  .  .  
+			            39 32 32 00 00 00 00 00 4D 61 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2D5 thru 0176D2E8 (1 lines) suppressed - all zero
+			   0176D2E9 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 00 57 40 
+	0176D2F1 Free    37
+			Next:0176D252
+	0176D316 InUse   53   0
+			   0176D31B 9  3  3  .  .  .  .  .  R  a  y     K  i  n  g  .  .  .  .  
+			            39 33 33 00 00 00 00 00 52 61 79 20 4B 69 6E 67 00 00 00 00 
+			   0176D32F thru 0176D342 (1 lines) suppressed - all zero
+			   0176D343 .  .  .  .  .  @  W  @  
+			            00 00 00 00 00 40 57 40 
+	0176D34B InUse   53   0
+			   0176D350 9  4  4  .  .  .  .  .  F  r  e  i  d  a     K  i  n  g  .  
+			            39 34 34 00 00 00 00 00 46 72 65 69 64 61 20 4B 69 6E 67 00 
+			   0176D364 thru 0176D377 (1 lines) suppressed - all zero
+			   0176D378 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 80 57 40 
+	0176D380 Free    37
+			Next:0176D2F1
+	0176D3A5 InUse   37   1
+			   0176D3AA T  T  P  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            54 54 50 30 30 31 00 00 00 00 00 00 02 00 00 00 66 66 66 66 
+			   0176D3BE f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D3CA InUse   42   1
+			   0176D3CF N  H  C  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            4E 48 43 30 30 31 00 00 00 00 00 00 01 00 00 00 66 66 66 66 
+			   0176D3E3 f  .  #  @  .  .  .  .  .  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 00 00 00 00 00 
+*
+>>> ALLOC C955 Customer 955,Harry King,NULL,NULL,95.00
+>>> ALLOC SSX002 LineItem SSX002,1,29.25,NULL
+>>> ALLOC SSX003 LineItem SSX003,1,29.35,NULL
+>>> ALLOC SSX004 LineItem SSX004,1,29.45,NULL
+*
+* XXXXXX 5
+>>> DUMP
+	Address  Mem   Size NodeType
+	0176D070 InUse   53   0
+			   0176D075 1  1  1  .  .  .  .  .  S  a  l     A     M  a  n  d  e  r  
+			            31 31 31 00 00 00 00 00 53 61 6C 20 41 20 4D 61 6E 64 65 72 
+			   0176D089 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 DF D0 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D09D .  .  .  .  .  .  Y  @  
+			            00 00 00 00 00 00 59 40 
+	0176D0A5 InUse   53   0
+			   0176D0AA 2  2  2  .  .  .  .  .  B  a  r  b     W  i  r  e  .  .  .  
+			            32 32 32 00 00 00 00 00 42 61 72 62 20 57 69 72 65 00 00 00 
+			   0176D0BE .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 04 D1 76 01 00 00 00 00 
+			   0176D0D2 .  .  .  .  .  .  i  @  
+			            00 00 00 00 00 00 69 40 
+	0176D0DA InUse   37   1
+			   0176D0DF P  P  F  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            50 50 46 30 30 31 00 00 00 00 00 00 05 00 00 00 66 66 66 66 
+			   0176D0F3 f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D0FF InUse   53   0
+			   0176D104 3  3  3  .  .  .  .  .  M  i  s  t  y     W  i  n  d  .  .  
+			            33 33 33 00 00 00 00 00 4D 69 73 74 79 20 57 69 6E 64 00 00 
+			   0176D118 .  .  .  .  .  .  .  .  .  .  .  .  9  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 39 D1 76 01 00 00 00 00 
+			   0176D12C .  .  .  .  .  .  Q  @  
+			            00 00 00 00 00 80 51 40 
+	0176D134 InUse   53   0
+			   0176D139 4  4  4  .  .  .  .  .  E  m  o  r  y     B  o  a  r  d  .  
+			            34 34 34 00 00 00 00 00 45 6D 6F 72 79 20 42 6F 61 72 64 00 
+			   0176D14D .  .  .  .  .  .  .  .  .  .  .  .  "  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 22 D2 76 01 00 00 00 00 
+			   0176D161 .  .  .  .  Q  8  F  @  
+			            B8 1E 85 EB 51 38 46 40 
+	0176D169 InUse   53   0
+			   0176D16E 5  5  5  .  .  .  .  .  H  o  l  l  y     G  r  a  p  h  .  
+			            35 35 35 00 00 00 00 00 48 6F 6C 6C 79 20 47 72 61 70 68 00 
+			   0176D182 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 A3 D1 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D196 .  .  .  .  .  .  K  @  
+			            00 00 00 00 00 80 4B 40 
+	0176D19E InUse   37   1
+			   0176D1A3 S  B  B  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 42 42 30 30 31 00 00 00 00 00 00 02 00 00 00 33 33 33 33 
+			   0176D1B7 3  .  3  @  .  .  v  .  .  .  .  .  
+			            33 F3 33 40 C8 D1 76 01 00 00 00 00 
+	0176D1C3 InUse   37   1
+			   0176D1C8 B  O  M  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            42 4F 4D 30 30 31 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D1DC 3  .  =  @  .  .  .  .  .  .  .  .  
+			            33 F3 3D 40 00 00 00 00 00 00 00 00 
+	0176D1E8 Free    53
+			Next:00000000
+	0176D21D InUse   53   0
+			   0176D222 7  7  7  .  .  .  .  .  F  l  o     N     W  a  t  e  r  .  
+			            37 37 37 00 00 00 00 00 46 6C 6F 20 4E 20 57 61 74 65 72 00 
+			   0176D236 .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D24A .  .  .  .  .  @  S  @  
+			            00 00 00 00 00 40 53 40 
+	0176D252 InUse   53   0
+			   0176D257 9  5  5  .  .  .  .  .  H  a  r  r  y     K  i  n  g  .  .  
+			            39 35 35 00 00 00 00 00 48 61 72 72 79 20 4B 69 6E 67 00 00 
+			   0176D26B thru 0176D27E (1 lines) suppressed - all zero
+			   0176D27F .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 C0 57 40 
+	0176D287 InUse   37   1
+			   0176D28C S  S  X  0  0  2  .  .  .  .  .  .  .  .  .  .  .  .  .  .  
+			            53 53 58 30 30 32 00 00 00 00 00 00 01 00 00 00 00 00 00 00 
+			   0176D2A0 .  @  =  @  .  .  .  .  .  .  .  .  
+			            00 40 3D 40 00 00 00 00 00 00 00 00 
+	0176D2AC Free    16
+			Next:0176D1E8
+	0176D2BC InUse   53   0
+			   0176D2C1 9  2  2  .  .  .  .  .  M  a  e     K  i  n  g  .  .  .  .  
+			            39 32 32 00 00 00 00 00 4D 61 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2D5 thru 0176D2E8 (1 lines) suppressed - all zero
+			   0176D2E9 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 00 57 40 
+	0176D2F1 InUse   37   1
+			   0176D2F6 S  S  X  0  0  4  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 53 58 30 30 34 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D30A 3  s  =  @  .  .  .  .  .  .  .  .  
+			            33 73 3D 40 00 00 00 00 00 00 00 00 
+	0176D316 InUse   53   0
+			   0176D31B 9  3  3  .  .  .  .  .  R  a  y     K  i  n  g  .  .  .  .  
+			            39 33 33 00 00 00 00 00 52 61 79 20 4B 69 6E 67 00 00 00 00 
+			   0176D32F thru 0176D342 (1 lines) suppressed - all zero
+			   0176D343 .  .  .  .  .  @  W  @  
+			            00 00 00 00 00 40 57 40 
+	0176D34B InUse   53   0
+			   0176D350 9  4  4  .  .  .  .  .  F  r  e  i  d  a     K  i  n  g  .  
+			            39 34 34 00 00 00 00 00 46 72 65 69 64 61 20 4B 69 6E 67 00 
+			   0176D364 thru 0176D377 (1 lines) suppressed - all zero
+			   0176D378 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 80 57 40 
+	0176D380 InUse   37   1
+			   0176D385 S  S  X  0  0  3  .  .  .  .  .  .  .  .  .  .  .  .  .  .  
+			            53 53 58 30 30 33 00 00 00 00 00 00 01 00 00 00 9A 99 99 99 
+			   0176D399 .  Y  =  @  .  .  .  .  .  .  .  .  
+			            99 59 3D 40 00 00 00 00 00 00 00 00 
+	0176D3A5 InUse   37   1
+			   0176D3AA T  T  P  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            54 54 50 30 30 31 00 00 00 00 00 00 02 00 00 00 66 66 66 66 
+			   0176D3BE f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D3CA InUse   42   1
+			   0176D3CF N  H  C  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            4E 48 43 30 30 31 00 00 00 00 00 00 01 00 00 00 66 66 66 66 
+			   0176D3E3 f  .  #  @  .  .  .  .  .  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 00 00 00 00 00 
+*
+>>> DEREF C933
+>>> DEREF C944
+>>> DEREF SSX003
+*
+* XXXXXX 6
+* 32-bit: Collection should have one existing and gather three adj
+* 64-bit: Collection should have two existing and gather three adj
+*
+>>> GCOLL
+	Collecting 0176D1E8
+	Collecting 0176D2AC
+	Collecting 0176D316
+	Combining 0176D316 with 0176D34B
+	Combining 0176D316 with 0176D380
+>>> DUMP
+	Address  Mem   Size NodeType
+	0176D070 InUse   53   0
+			   0176D075 1  1  1  .  .  .  .  .  S  a  l     A     M  a  n  d  e  r  
+			            31 31 31 00 00 00 00 00 53 61 6C 20 41 20 4D 61 6E 64 65 72 
+			   0176D089 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 DF D0 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D09D .  .  .  .  .  .  Y  @  
+			            00 00 00 00 00 00 59 40 
+	0176D0A5 InUse   53   0
+			   0176D0AA 2  2  2  .  .  .  .  .  B  a  r  b     W  i  r  e  .  .  .  
+			            32 32 32 00 00 00 00 00 42 61 72 62 20 57 69 72 65 00 00 00 
+			   0176D0BE .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 04 D1 76 01 00 00 00 00 
+			   0176D0D2 .  .  .  .  .  .  i  @  
+			            00 00 00 00 00 00 69 40 
+	0176D0DA InUse   37   1
+			   0176D0DF P  P  F  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            50 50 46 30 30 31 00 00 00 00 00 00 05 00 00 00 66 66 66 66 
+			   0176D0F3 f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D0FF InUse   53   0
+			   0176D104 3  3  3  .  .  .  .  .  M  i  s  t  y     W  i  n  d  .  .  
+			            33 33 33 00 00 00 00 00 4D 69 73 74 79 20 57 69 6E 64 00 00 
+			   0176D118 .  .  .  .  .  .  .  .  .  .  .  .  9  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 39 D1 76 01 00 00 00 00 
+			   0176D12C .  .  .  .  .  .  Q  @  
+			            00 00 00 00 00 80 51 40 
+	0176D134 InUse   53   0
+			   0176D139 4  4  4  .  .  .  .  .  E  m  o  r  y     B  o  a  r  d  .  
+			            34 34 34 00 00 00 00 00 45 6D 6F 72 79 20 42 6F 61 72 64 00 
+			   0176D14D .  .  .  .  .  .  .  .  .  .  .  .  "  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 22 D2 76 01 00 00 00 00 
+			   0176D161 .  .  .  .  Q  8  F  @  
+			            B8 1E 85 EB 51 38 46 40 
+	0176D169 InUse   53   0
+			   0176D16E 5  5  5  .  .  .  .  .  H  o  l  l  y     G  r  a  p  h  .  
+			            35 35 35 00 00 00 00 00 48 6F 6C 6C 79 20 47 72 61 70 68 00 
+			   0176D182 .  .  .  .  .  .  v  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 A3 D1 76 01 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D196 .  .  .  .  .  .  K  @  
+			            00 00 00 00 00 80 4B 40 
+	0176D19E InUse   37   1
+			   0176D1A3 S  B  B  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 42 42 30 30 31 00 00 00 00 00 00 02 00 00 00 33 33 33 33 
+			   0176D1B7 3  .  3  @  .  .  v  .  .  .  .  .  
+			            33 F3 33 40 C8 D1 76 01 00 00 00 00 
+	0176D1C3 InUse   37   1
+			   0176D1C8 B  O  M  0  0  1  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            42 4F 4D 30 30 31 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D1DC 3  .  =  @  .  .  .  .  .  .  .  .  
+			            33 F3 3D 40 00 00 00 00 00 00 00 00 
+	0176D1E8 Free    53
+			Next:00000000
+	0176D21D InUse   53   0
+			   0176D222 7  7  7  .  .  .  .  .  F  l  o     N     W  a  t  e  r  .  
+			            37 37 37 00 00 00 00 00 46 6C 6F 20 4E 20 57 61 74 65 72 00 
+			   0176D236 .  .  .  .  .  .  .  .  .  .  .  .  .  .  v  .  .  .  .  .  
+			            00 00 00 00 00 00 00 00 00 00 00 00 AA D0 76 01 00 00 00 00 
+			   0176D24A .  .  .  .  .  @  S  @  
+			            00 00 00 00 00 40 53 40 
+	0176D252 InUse   53   0
+			   0176D257 9  5  5  .  .  .  .  .  H  a  r  r  y     K  i  n  g  .  .  
+			            39 35 35 00 00 00 00 00 48 61 72 72 79 20 4B 69 6E 67 00 00 
+			   0176D26B thru 0176D27E (1 lines) suppressed - all zero
+			   0176D27F .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 C0 57 40 
+	0176D287 InUse   37   1
+			   0176D28C S  S  X  0  0  2  .  .  .  .  .  .  .  .  .  .  .  .  .  .  
+			            53 53 58 30 30 32 00 00 00 00 00 00 01 00 00 00 00 00 00 00 
+			   0176D2A0 .  @  =  @  .  .  .  .  .  .  .  .  
+			            00 40 3D 40 00 00 00 00 00 00 00 00 
+	0176D2AC Free    16
+			Next:0176D1E8
+	0176D2BC InUse   53   0
+			   0176D2C1 9  2  2  .  .  .  .  .  M  a  e     K  i  n  g  .  .  .  .  
+			            39 32 32 00 00 00 00 00 4D 61 65 20 4B 69 6E 67 00 00 00 00 
+			   0176D2D5 thru 0176D2E8 (1 lines) suppressed - all zero
+			   0176D2E9 .  .  .  .  .  .  W  @  
+			            00 00 00 00 00 00 57 40 
+	0176D2F1 InUse   37   1
+			   0176D2F6 S  S  X  0  0  4  .  .  .  .  .  .  .  .  .  .  3  3  3  3  
+			            53 53 58 30 30 34 00 00 00 00 00 00 01 00 00 00 33 33 33 33 
+			   0176D30A 3  s  =  @  .  .  .  .  .  .  .  .  
+			            33 73 3D 40 00 00 00 00 00 00 00 00 
+	0176D316 Free   143
+			Next:0176D2AC
+	0176D3A5 InUse   37   1
+			   0176D3AA T  T  P  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            54 54 50 30 30 31 00 00 00 00 00 00 02 00 00 00 66 66 66 66 
+			   0176D3BE f  .  #  @  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 
+	0176D3CA InUse   42   1
+			   0176D3CF N  H  C  0  0  1  .  .  .  .  .  .  .  .  .  .  f  f  f  f  
+			            4E 48 43 30 30 31 00 00 00 00 00 00 01 00 00 00 66 66 66 66 
+			   0176D3E3 f  .  #  @  .  .  .  .  .  .  .  .  .  .  .  .  .  
+			            66 E6 23 40 00 00 00 00 00 00 00 00 00 00 00 00 00 
+
+
