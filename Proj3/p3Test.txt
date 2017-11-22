@@ -1,0 +1,36 @@
+;;; -=  
+(setf x 5 y 10)
+(-= x 1)
+x
+(-= y x)
+y
+
+;;; select A.
+(setf good 0)
+(setf bad 0)
+(defvar grade)
+(defun gradeStuff (grade)
+    (select grade
+        (when (A B)
+           (setf good (+ 1 good))
+           (print "doing well")
+        )
+        (when (C)
+           (print "average"))
+        (when (D F)
+           (setf bad (+ bad 1))
+           (print "oh no")
+        )
+        (default
+           (print (list "unknown value=" grade)))
+    )
+)
+(gradeStuff 'A)
+(gradeStuff 'B)
+(gradeStuff 'C)
+(gradeStuff 'D)
+(gradeStuff 'F)
+(gradestuff 'U)
+(print (list "good=" good "bad=" bad))
+
+

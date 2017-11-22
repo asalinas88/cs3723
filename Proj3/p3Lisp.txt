@@ -1,0 +1,109 @@
+;;; MEMSET
+;;;   Parameters:
+;;;     atm - an atom we want to check in a set
+;;;   Purpose:
+;;;     checks if an atom is a member in a set at the top-level
+(defun MEMSET (atm L)
+    (cond ( (NULL L) NIL)
+          ( (EQL atm (CAR L)) T )
+          ( T        (MEMSET atm (CDR L)) )))
+
+
+;;; EVALEACH
+;;;   Parameters:
+;;;     lis - a list of values that need to be evaluated
+;;;   Purposes:
+;;;     Evaluates each item in the list
+(defun evalEach(lis)
+    (cond ( (NULL lis) NIL )
+          ( (NULL (CDR lis)) (eval(CAR lis)))
+          ( T (eval (CAR lis)) (evalEach (CDR lis)))))
+
+;;; -=
+;;; Parameters:
+;;;     numericVariable: a variable that is passed to be decremented
+;;;                      and changed
+;;;     decrementValue: a value that is substracted from numericVariable
+;;; Purpose:
+;;;     -= is a macro that is passed a variable which it decrements 
+;;;        by the decrementValue and assigns a new value to the 
+;;;        numericVariableA
+;;;
+;;; Example:
+;;;     > (setf x 5)
+;;;           5
+;;;     > (-= x 1)
+;;;           4
+;;;     > x
+;;;       4
+;;; Expansion:
+;;;     (macroexpand-1 '(-= 10 4))
+;;;     (SETF 10 (- 10 4)) ;
+;;;     T
+(defmacro -= (numericVariable decrementValue)
+    (list 'setf numericVariable `(- ,numericVariable ,decrementValue)))
+    
+;;; SELECT
+;;; Parameters:
+;;;      grade - a value being passed
+;;;     &pairs - a list that will be created
+;;; Purpose:
+;;;     Depending on whether or not a value matches an expression
+;;;     if the value matches a value in the value list, the specified
+;;;     functions will be executed.
+;;; Example:
+;;;     (select grade
+;;;         (when (A B)
+;;;             (setf good (+1 good))
+;;;             (print "doing well")
+;;;         )
+;;;         (when (C)
+;;;             (print "average")
+;;;         )
+;;;         (when (D F)
+;;;             (setf bad (+ bad 1))
+;;;             (prin "oh no")
+;;;         )
+;;;         (default
+;;;             (print (list "unknown value=" grade))
+;;;         )
+;;;     )
+;;; Expansion: 
+;;;     (macroexpand-1 '(select grade
+;;;         (when (A B)
+;;;             (setf good (+1 good))
+;;;             (print "doing well")
+;;;         )
+;;;         (when (C)
+;;;             (print "average")
+;;;         )
+;;;         (when (D F)
+;;;             (setf bad (+ bad 1))
+;;;             (prin "oh no")
+;;;         )
+;;;         (default
+;;;             (print (list "unknown value=" grade))
+;;;         )
+;;;     ))
+;;;
+;;;     (DO
+;;;     ((#:G3210
+;;;        '((WHEN (A B) (SETF GOOD (+ 1 GOOD)) (PRINT "doing well"))
+;;;          (WHEN (C) (PRINT "average"))
+;;;          (WHEN (D F) (SETF BAD (+ BAD 1)) (PRINT "oh no"))
+;;;          (DEFAULT (PRINT (LIST "unknown value=" GRADE))))
+;;;                (CDR #:G3210)))
+;;;                      ((NULL #:G3210) NIL)
+;;;              (COND ((EQL 'DEFAULT (CAAR #:G3210)) 
+;;;                     (RETURN (EVALEACH (CDAR #:G3210))))
+;;;                     ((MEMSET GRADE (CADAR #:G3210)) 
+;;;                     (RETURN (EVALEACH (CDDAR #:G3210)))))) ;
+;;;     T
+(defmacro SELECT (grade &rest pairs)
+        (let ((g (gensym)) )
+            `( do ((,g ' ,pairs (cdr ,g)) )
+                  ((null ,g) NIL)
+                  (cond ((eql 'DEFAULT (caar ,g)) 
+                        (return (evalEach (cdar ,g))))
+                        ((memset ,grade (cadar ,g))
+                        (return (evalEach (cddar ,g)))) )) ) ) 

@@ -1,0 +1,11 @@
+(DO
+ ((#:G3210
+   '((WHEN (A B) (SETF GOOD (+ 1 GOOD)) (PRINT "doing well"))
+     (WHEN (C) (PRINT "average"))
+     (WHEN (D F) (SETF BAD (+ BAD 1)) (PRINT "oh no"))
+     (DEFAULT (PRINT (LIST "unknown value=" GRADE))))
+   (CDR #:G3210)))
+ ((NULL #:G3210) NIL)
+ (COND ((EQL 'DEFAULT (CAAR #:G3210)) (RETURN (EVALEACH (CDAR #:G3210))))
+  ((MEMSET GRADE (CADAR #:G3210)) (RETURN (EVALEACH (CDDAR #:G3210)))))) ;
+T
