@@ -1,0 +1,139 @@
+;;;(load "p4LispDef.txt")
+
+
+;;; READLIST
+;;;   Parameters:
+;;;     lis - a list that we can loop through and print
+;;;   Purpose:
+;;;     Print each item of the list that is at the top level
+(defun readList(lis)
+   (cond ( (NULL lis) NIL)
+          ( T (PRINC (CAR lis)) (PRINC " ") (readList (CDR lis)))))
+
+;;; PRINTWOP
+;;;   Parameters:
+;;;     lis - a list to be printed
+;;;   Purpose:
+;;;     Prints a list without surrounding parentheses.
+;;;      One element of a list per line
+(defun printWOP(lis)
+   ;;; (terpri)
+    (cond ( ( ATOM lis) (PRINC lis) )
+          ( T (readList lis) )) 
+          
+          T )
+
+
+;;; DIAG
+;;;  Parameters:
+;;;     diagnosisID - key
+;;;     diagnosis   - value in hash table
+;;;  Purpose:
+;;;     puts entry into the diagnosis hash table
+;;;  Example:
+;;;  Expansion:
+(defmacro diag(diagnosisID &rest diagnosis)
+        `(putp ' ,diagnosisID diag-HT ' ,diagnosis))
+
+;;; ISA
+;;; Parameters:
+;;;     expr - can be an atm or a list
+;;;     type - value in the isa-HT
+;;; Purpose:
+;;;     puts an entry into the isa-HT
+;;; Example:
+;;;     (isa (tenderness in abdome)n pain)
+;;; Expansion:
+;;;     (macroexpand-1 (isa (tenderness in abodemt) pain))
+;;;     (PUTP '(TENDERNESS IN ABDOMENT) ISA_HT 'PAIN)
+;;;     T
+(defmacro isa(expr type)
+        `(putp ' ,expr isa-HT ' ,type))
+
+;;; SYMPTOM
+;;; Parameters:
+;;;     symp - key in hash table
+;;; Purpose:
+;;;     Puts an entry into the symptom hash table
+;;;     If the symptom has an isa in the isa hash table
+;;;     it also inserts an entry for that isa in in the isa hash table
+;;; Example:
+;;;     (symptom tenderness in abdomen)
+;;; Expansion:
+;;;     (macroexpand-1 '(symptom tenderness in abdomen))
+;;;     NIL ;
+;;;     T
+
+(defmacro symptom (&rest symp)
+        (putp symp symptom-ht T)
+        (if (setf key (getp symp isa-ht))
+            `(symptom ,key)))
+
+
+;;; PUTSPACE
+;;; Parameters:
+;;;     n - number of spaces
+;;; Purpose:
+;;;     Inserts designated number of spaces
+(defun putspace(n)
+    (do ((x 0 (1+ x)))
+        ((> x n) T)
+        (princ " ")
+        )
+    )
+
+;;; INCREASEOFFSET
+;;; Parameters:
+;;;     node   - key in the hash table
+;;;     offset - number of initial spaces
+;;; Purpose:
+;;;     Increase number of spaces as it prints in a recursive manner
+(defun increaseoffset(node offset)
+ (cond ((setf child (getp node question-HT)) 
+            (printWOP (append (list node) '("Question:")))
+            (printWOP (append (cddr child) '("?")))
+            (let ((yes (car child)) (no (cadr child)))
+                (terpri)
+                (putspace (+ 4 offset))
+                (princ "Y: ")
+                (increaseoffset yes (+ 4 offset))
+                (terpri) 
+                (putspace (+ 4 offset))
+                (princ "N: ")
+                (increaseoffset no (+ 4 offset))
+                (terpri)))
+        (T (setf diagnosis (getp node diag-HT))
+           (printWOP (append (list node "Diagnosis:" ) diagnosis))
+           )
+        )
+ )
+
+
+;;; PRINTTREE
+;;; Parameters:
+;;;     rootID - ID of the root of the diagnosis tree
+;;; Purpose:
+;;;     prints diagnosis tree
+(defun printTree(rootID)
+        (increaseoffset rootID 0))
+
+;;; TRIAGE
+;;; Purpose:
+;;;     Shows execution of diagnosis tree based on symptoms
+;;;     Returns diagnosis or NIL
+(defun triage()
+    (terpri)
+    (do ((myVar 'Q1 (car hashVar)))
+        ((setf diagnosis (getp myVar diag-HT)) 
+         (return diagnosis) )
+        (terpri)
+        (setf hashVar (getp myVar question-HT))
+        (printWOP (list "ID:" myVar hashVar))
+        (cond ((getp (cddr hashVar) symptom-HT)
+                (princ "Y"))
+              ( T (princ "N") (setf hashVar (cdr hashVar)))
+        )
+        
+        (terpri)
+    )
+)
